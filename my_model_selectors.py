@@ -76,8 +76,49 @@ class SelectorBIC(ModelSelector):
         """
         warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-        # TODO implement model selection based on BIC scores
-        raise NotImplementedError
+        # Setup necessary variables.
+
+        best_BIC = None
+        best_n_components = None
+        logN = math.log(len(self.sequences))
+        f = len(self.X[0])
+
+        try:
+
+            # Consider possible choices for number of model states.
+            for n_components in range(self.min_n_components, self.max_n_components+1):
+
+                # Compute the number of free parameters coming from
+                # transmat + means + covar matrices + initial distribution
+                # https://discussions.udacity.com/t/understanding-better-model-selection/232987/3
+                p = n_components * n_components + 2 * f * n_components - 1
+
+                try:
+                    # Train the model.
+                    model = GaussianHMM(n_components=n_components, covariance_type="diag", n_iter=1000,
+                                        random_state=self.random_state, verbose=False).fit(self.X, self.lengths)
+
+                    # Compute model's BIC score.
+                    logL = model.score(self.X, self.lengths)
+                    BIC = - 2 * logL + p * logN
+
+                    # print(self.this_word, n_components, -2 * logL, p * logN, BIC)
+
+                    # Remember the best (smallest) results.
+                    if best_BIC is None or BIC < best_BIC:
+                        best_BIC = BIC
+                        best_n_components = n_components
+
+                except:
+                    continue
+
+            # Return the best choice of model.
+            return self.base_model(best_n_components)
+
+        except:
+            # Unless we couldn't find the best choice.
+            return None
+
 
 
 class SelectorDIC(ModelSelector):
@@ -93,8 +134,47 @@ class SelectorDIC(ModelSelector):
     def select(self):
         warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-        # TODO implement model selection based on DIC scores
-        raise NotImplementedError
+        # Setup necessary variables.
+
+        best_DIC = None
+        best_n_components = None
+        factor = 1.0 / (len(self.words) - 1.0)
+
+        try:
+
+            # Consider possible choices for number of model states.
+            for n_components in range(self.min_n_components, self.max_n_components+1):
+
+                try:
+                    # Train the model.
+                    model = GaussianHMM(n_components=n_components, covariance_type="diag", n_iter=1000,
+                                        random_state=self.random_state, verbose=False).fit(self.X, self.lengths)
+
+                    # Compute model's score for this word log(P(X(i)).
+                    DIC = model.score(self.X, self.lengths)
+
+                    # Adjust by values for all other words - 1/(M-1)SUM(log(P(X(all but i)).
+                    for word in self.words:
+                        if word != self.this_word:
+                            other_X, other_lengths = self.hwords[word]
+                            DIC -= factor * model.score(other_X, other_lengths)
+
+                    # Remember the best (largest) results.
+                    if best_DIC is None or DIC > best_DIC:
+                        best_DIC = DIC
+                        best_n_components = n_components
+
+                except:
+                    continue
+
+            # Return the best choice of model.
+            return self.base_model(best_n_components)
+
+        except:
+            raise
+            # Unless we couldn't find the best choice.
+            return None
+
 
 
 class SelectorCV(ModelSelector):
@@ -103,7 +183,60 @@ class SelectorCV(ModelSelector):
     '''
 
     def select(self):
+
         warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-        # TODO implement model selection using CV
-        raise NotImplementedError
+        # Setup necessary variables.
+        best_logL = None
+        best_n_components = None
+
+        # Create the split method, cannot use more splits than data.
+        split_method = KFold(n_splits=min(3, len(self.sequences)))
+
+        try:
+            # Consider possible choices for number of model states.
+            for n_components in range(self.min_n_components, self.max_n_components+1):
+
+                try:
+                    sum_logL = 0
+                    count_logL = 0
+
+                    # Consider different splits, produced by split_method.
+                    for train_idx, test_idx in split_method.split(self.sequences):
+
+                        try:
+
+                            # Combine the sequences back.
+                            trainX, trainlengths = combine_sequences(train_idx, self.sequences)
+                            testX, testlengths = combine_sequences(test_idx, self.sequences)
+
+                            # Use our selected set for training.
+                            model = GaussianHMM(n_components=n_components, covariance_type="diag", n_iter=1000,
+                                            random_state=self.random_state, verbose=False).fit(trainX, trainlengths)
+
+                            # Use sequences left out from training for testing.
+                            sum_logL += model.score(testX, testlengths)
+                            count_logL += 1
+
+                        except:
+                            continue
+
+
+                    # Compute the average.
+                    logL = sum_logL / count_logL
+
+                    # Remember the best (largest) results.
+                    if best_logL is not None and logL <= best_logL:
+                        continue
+                    best_logL = logL
+                    best_n_components = n_components
+
+                except:
+                    continue
+
+            # Return the best choice of model.
+            return self.base_model(best_n_components)
+
+        except:
+            # Unless we couldn't find the best choice.
+            return None

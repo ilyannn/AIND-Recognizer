@@ -81,7 +81,7 @@ class SelectorBIC(ModelSelector):
         best_BIC = None
         best_n_components = None
         logN = math.log(len(self.sequences))
-        f = len(self.X[0])
+        f = self.X.shape[1]
 
         try:
 
@@ -171,10 +171,17 @@ class SelectorDIC(ModelSelector):
             return self.base_model(best_n_components)
 
         except:
-            raise
             # Unless we couldn't find the best choice.
             return None
 
+
+class TrivialSplitMethod:
+    ''' don't actually split – return all indices
+
+    '''
+    def split(self, sequences):
+        indices = range(0, len(sequences))
+        return indices, indices
 
 
 class SelectorCV(ModelSelector):
@@ -191,7 +198,10 @@ class SelectorCV(ModelSelector):
         best_n_components = None
 
         # Create the split method, cannot use more splits than data.
-        split_method = KFold(n_splits=min(3, len(self.sequences)))
+        try:
+            split_method = KFold(n_splits=min(3, len(self.sequences)))
+        except:
+            split_method = TrivialSplitMethod()
 
         try:
             # Consider possible choices for number of model states.

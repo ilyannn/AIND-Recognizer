@@ -1,5 +1,6 @@
 import warnings
 from asl_data import SinglesData
+from math import inf
 
 
 def recognize(models: dict, test_set: SinglesData):
@@ -18,8 +19,32 @@ def recognize(models: dict, test_set: SinglesData):
            ['WORDGUESS0', 'WORDGUESS1', 'WORDGUESS2',...]
    """
     warnings.filterwarnings("ignore", category=DeprecationWarning)
+
+    # Setup necessary variables.
     probabilities = []
-    guesses = []
-    # TODO implement the recognizer
-    # return probabilities, guesses
-    raise NotImplementedError
+
+    # Iterate over given words.
+    challenges = sorted(test_set.get_all_Xlengths().keys())
+
+    for challenge in challenges:
+
+        # Get the challenge data.
+        X, lengths = test_set.get_item_Xlengths(challenge)
+
+        # Calculate the probability.
+        def calculate(model):
+            try:
+                return model.score(X, lengths)
+            # Sometimes we get mysterious exceptions.
+            except:
+                return -inf
+
+        p = {word: calculate(model) for word, model in models.items()}
+        probabilities.append(p)
+
+    # Compute the best choices.
+    guesses = list(map(lambda p: max(p.items())[0], probabilities))
+
+#    print("Errors encountered for models of: {}".format(error_words))
+
+    return probabilities, guesses

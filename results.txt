@@ -1,0 +1,72 @@
+----------- For norm using model <class 'my_model_selectors.SelectorCV'>:
+
+**** WER = 0.601123595505618
+Total correct: 71 out of 178
+----------- For norm using model <class 'my_model_selectors.SelectorBIC'>:
+
+**** WER = 0.6179775280898876
+Total correct: 68 out of 178
+----------- For norm using model <class 'my_model_selectors.SelectorDIC'>:
+
+**** WER = 0.6235955056179775
+Total correct: 67 out of 178
+----------- For polar using model <class 'my_model_selectors.SelectorCV'>:
+
+**** WER = 0.5786516853932584
+Total correct: 75 out of 178
+----------- For polar using model <class 'my_model_selectors.SelectorBIC'>:
+
+**** WER = 0.550561797752809
+Total correct: 80 out of 178
+----------- For polar using model <class 'my_model_selectors.SelectorDIC'>:
+
+**** WER = 0.5449438202247191
+Total correct: 81 out of 178
+----------- For ground using model <class 'my_model_selectors.SelectorCV'>:
+
+**** WER = 0.5337078651685393
+Total correct: 83 out of 178
+----------- For ground using model <class 'my_model_selectors.SelectorBIC'>:
+
+**** WER = 0.5561797752808989
+Total correct: 79 out of 178
+----------- For ground using model <class 'my_model_selectors.SelectorDIC'>:
+
+**** WER = 0.5786516853932584
+Total correct: 75 out of 178
+----------- For delta using model <class 'my_model_selectors.SelectorCV'>:
+
+**** WER = 0.6235955056179775
+Total correct: 67 out of 178
+----------- For delta using model <class 'my_model_selectors.SelectorBIC'>:
+
+**** WER = 0.6348314606741573
+Total correct: 65 out of 178
+----------- For delta using model <class 'my_model_selectors.SelectorDIC'>:
+
+**** WER = 0.6573033707865169
+Total correct: 61 out of 178
+----------- For custom using model <class 'my_model_selectors.SelectorCV'>:
+
+**** WER = 0.601123595505618
+Total correct: 71 out of 178
+----------- For custom using model <class 'my_model_selectors.SelectorBIC'>:
+
+**** WER = 0.5898876404494382
+Total correct: 73 out of 178
+----------- For custom using model <class 'my_model_selectors.SelectorDIC'>:
+
+**** WER = 0.601123595505618
+Total correct: 71 out of 178
+----------- For combined using model <class 'my_model_selectors.SelectorCV'>:
+
+**** WER = 0.5056179775280899
+Total correct: 88 out of 178
+----------- For combined using model <class 'my_model_selectors.SelectorBIC'>:
+
+**** WER = 0.5337078651685393
+Total correct: 83 out of 178
+----------- For combined using model <class 'my_model_selectors.SelectorDIC'>:
+
+**** WER = 0.5056179775280899
+Total correct: 88 out of 178

@@ -1,7 +1,7 @@
 import warnings
 from asl_data import SinglesData
 from math import inf
-
+import operator
 
 def recognize(models: dict, test_set: SinglesData):
     """ Recognize test word sequences from word models set
@@ -22,6 +22,7 @@ def recognize(models: dict, test_set: SinglesData):
 
     # Setup necessary variables.
     probabilities = []
+    guesses = []
 
     # Iterate over given words.
     challenges = sorted(test_set.get_all_Xlengths().keys())
@@ -42,8 +43,8 @@ def recognize(models: dict, test_set: SinglesData):
         p = {word: calculate(model) for word, model in models.items()}
         probabilities.append(p)
 
-    # Compute the best choices.
-    guesses = list(map(lambda p: max(p.items())[0], probabilities))
+        best_guess = max(p.items(), key=operator.itemgetter(1))
+        guesses.append(best_guess[0])
 
 #    print("Errors encountered for models of: {}".format(error_words))
 

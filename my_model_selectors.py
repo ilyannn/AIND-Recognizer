@@ -236,10 +236,9 @@ class SelectorCV(ModelSelector):
                     logL = sum_logL / count_logL
 
                     # Remember the best (largest) results.
-                    if best_logL is not None and logL <= best_logL:
-                        continue
-                    best_logL = logL
-                    best_n_components = n_components
+                    if best_logL is None or logL > best_logL:
+                        best_logL = logL
+                        best_n_components = n_components
 
                 except:
                     continue
